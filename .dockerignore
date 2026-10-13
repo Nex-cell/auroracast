@@ -1,0 +1,16 @@
+.git
+.venv
+.env
+.env.*
+env.sample
+.claude
+.codex
+.idea
+.vscode
+data
+docs
+mlruns
+tests
+**/__pycache__
+**/*.pyc
+*:Zone.Identifier

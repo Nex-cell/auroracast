@@ -1,0 +1,9 @@
+# Live data sources. Non-secret settings only; secrets go in .env.
+
+rtsw:
+  # NOAA SWPC real-time solar wind, 1-min, rolling ~24 h window -> must be persisted.
+  wind_url: https://services.swpc.noaa.gov/json/rtsw/rtsw_wind_1m.json
+  mag_url: https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json
+  # Hourly polling leaves ~23 h of slack before the window rolls over.
+  poll_interval_seconds: 3600
+  request_timeout_seconds: 30
