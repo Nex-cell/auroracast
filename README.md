@@ -1,12 +1,22 @@
 # auroracast
 
+## Updates / Info for lecturers
+
+> This section is where I post updates and notes for you ahead of each milestone (MS).
+> Newest entry first; everything below it documents the project itself.
+
+### 2026-10-14
+- Live solar-wind collection (NOAA RTSW, wind + magnetic field) has been running since 14 Oct 2026.
+  The feed only keeps ~24 h, so it is persisted hourly into TimescaleDB. For now it runs on my laptop
+  and will move to the cloud VM once that is set up.
+
 ## Live RTSW collector
 
 NOAA's real-time solar-wind feeds only keep the last ~24 h, so a collector polls them hourly
 and stores every row in TimescaleDB (`raw_rtsw_wind`, `raw_rtsw_mag`).
 
 ```bash
-cp env.sample .env                    # then set real values
+cp .env.sample .env                   # then set real values
 docker compose up -d --build          # starts TimescaleDB + the collector
 docker compose logs -f rtsw-collector # one "upserted N rows" line per feed per hour
 ```
