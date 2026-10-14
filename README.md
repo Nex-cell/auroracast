@@ -10,6 +10,11 @@
   The feed only keeps ~24 h, so it is persisted hourly into TimescaleDB. For now it runs on my laptop
   and will move to the cloud VM once that is set up.
 
+  Progress has been slowed due to me being sick from early to mid oktober.
+
+  Also I am negotiating a deal on a cloud VM for running this and other services. Wich is why data collection is still only local.
+  If the deal doesnt workout there is free credit as a fallback.
+  
 ## Live RTSW collector
 
 NOAA's real-time solar-wind feeds only keep the last ~24 h, so a collector polls them hourly
