@@ -33,5 +33,11 @@ services:
       timescaledb:
         condition: service_healthy
 
+networks:
+  default:
+    driver_opts:
+      # Below the usual 1500 so HTTPS still works behind a VPN (bigger packets get dropped there).
+      com.docker.network.driver.mtu: "1400"
+
 volumes:
   timescale_data:
