@@ -1,0 +1,41 @@
+# Hourly NOAA RTSW poller writing to the hosted TimescaleDB (Tiger Cloud) until the VM exists.
+# Delayed or skipped runs are harmless: each run fetches the full ~24 h window and upserts.
+# Needs the repository secret DATABASE_URL.
+name: rtsw-poller
+
+on:
+  schedule:
+    - cron: "17 * * * *"  # hourly, off the full hour (GitHub delays runs at :00 the most)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rtsw-poller
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Poll RTSW into hosted DB
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PYTHONPATH: src
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::Repository secret DATABASE_URL is not set"
+            exit 1
+          fi
+          python -m auroracast.ingest.rtsw

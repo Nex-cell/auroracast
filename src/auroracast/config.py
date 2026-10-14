@@ -15,7 +15,9 @@ def load_config(name: str = "sources.yaml") -> dict:
 
 
 def db_conninfo() -> str:
-    """Build the Postgres connection string from the POSTGRES_* variables (see env.sample)."""
+    """DATABASE_URL if set (hosted DB, e.g. Tiger Cloud), else built from the POSTGRES_* variables (local Compose)."""
+    if url := os.environ.get("DATABASE_URL"):
+        return url
     return make_conninfo(
         host=os.environ.get("POSTGRES_HOST", "localhost"),
         port=os.environ.get("POSTGRES_PORT", "5432"),

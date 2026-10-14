@@ -29,6 +29,7 @@ services:
     environment:
       POSTGRES_HOST: timescaledb
       POSTGRES_PORT: "5432"
+      DATABASE_URL: ""  # always write to the local DB, even if .env holds the hosted DATABASE_URL
     depends_on:
       timescaledb:
         condition: service_healthy
