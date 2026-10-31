@@ -39,3 +39,11 @@ jobs:
             exit 1
           fi
           python -m auroracast.ingest.rtsw
+
+      # Runs even if the RTSW step failed; a GFZ outage marks the run failed but RTSW is already stored.
+      - name: Poll GFZ Kp into hosted DB
+        if: ${{ !cancelled() }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PYTHONPATH: src
+        run: python -m auroracast.ingest.kp

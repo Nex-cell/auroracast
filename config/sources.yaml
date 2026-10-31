@@ -7,3 +7,10 @@ rtsw:
   # Hourly polling leaves ~23 h of slack before the window rolls over.
   poll_interval_seconds: 3600
   request_timeout_seconds: 30
+
+kp:
+  # GFZ Potsdam Kp: 'pre' values are published (and revised) during each 3-h interval,
+  # 'def' values monthly. The live lookback covers more than a month so definitive updates are caught.
+  url: https://kp.gfz.de/app/json/
+  live_lookback_days: 45
+  request_timeout_seconds: 60
