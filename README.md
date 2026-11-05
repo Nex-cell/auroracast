@@ -61,19 +61,85 @@ The proposal's target of recall >= 0.50 at precision >= 0.40 is weaker than pers
 so those values remain only as floors and the model must also match the baseline. Logging of NOAA's
 forecast for the live comparison is not built yet.
 
-## Live RTSW collector
+## What runs where
 
-NOAA's real-time solar-wind feeds only keep the last ~24 h, so a collector polls them hourly
-and stores every row in TimescaleDB (`raw_rtsw_wind`, `raw_rtsw_mag`).
+| Part | Where | How |
+|---|---|---|
+| TimescaleDB with all data | Infomaniak Ubuntu VM | Docker Compose |
+| RTSW solar wind, hourly | VM | `rtsw-collector` container, which loops by itself |
+| GFZ Kp, hourly | VM | crontab entry |
+| Backup of both polls | GitHub Actions into Tiger Cloud | `.github/workflows/rtsw-poller.yml` |
+
+The reasons for this setup and how it evolved are in [DECISIONS.md](DECISIONS.md). No forecasting model or
+feature pipeline exists yet.
+
+## Setup from a fresh clone
+
+You need Docker with Compose, and Python 3.12 or newer for the tests and the notebook.
+
+### 1. Configure and start
 
 ```bash
-cp .env.sample .env                   # then set real values
-docker compose up -d --build          # starts TimescaleDB + the collector
-docker compose logs -f rtsw-collector # one "upserted N rows" line per feed per hour
+cp .env.sample .env                    # then set real values; the variables are explained in that file
+docker compose up -d --build           # starts TimescaleDB and the RTSW collector
+docker compose logs -f rtsw-collector  # expect one "upserted N rows" line per feed per hour
 ```
 
-Data lives in the Docker volume `auroracast_timescale_data`. `docker compose down` keeps it;
-`docker compose down -v` deletes it.
+The collector creates all database tables when it starts. NOAA's real-time feed only keeps the last ~24 h,
+so polls must not be more than about 20 hours apart, or that data is lost for good.
+
+By default the database lives in the Docker volume `auroracast_timescale_data`. To use another location, set
+`TIMESCALE_DATA_PATH` to an absolute path before the first start. `docker compose down` keeps the data;
+`docker compose down -v` deletes the Docker volume.
+
+### 2. Load history
+
+```bash
+docker compose run --rm rtsw-collector python -m auroracast.ingest.kp --backfill 1998 2026
+docker compose run -d --name omni-backfill rtsw-collector python -m auroracast.ingest.omni --years 1998 2026
+docker logs -f omni-backfill
+```
+
+The Kp backfill takes about a minute. OMNI downloads one ~160 MB file per year and uses about 3 GB in the
+database. It keeps running if your SSH session drops. Both are safe to rerun; for OMNI, remove the old
+container first with `docker rm omni-backfill`.
+
+### 3. Poll Kp hourly
+
+The Kp ingest runs once and exits, so schedule it with `crontab -e`, using your project path:
+
+```
+17 * * * * cd /path/to/auroracast && docker compose run --rm rtsw-collector python -m auroracast.ingest.kp >> /tmp/kp.log 2>&1
+```
+
+### 4. Connect to the database
+
+Postgres only listens on `127.0.0.1`, so from another machine use an SSH tunnel and leave it running:
+
+```bash
+ssh -N -L 15432:localhost:5432 <user>@<server-ip>
+```
+
+The database is then at `localhost:15432`. Use the port from `docker compose port timescaledb 5432` if you
+changed `POSTGRES_HOST_PORT`. On WSL, a tunnel opened in PowerShell is not reachable from WSL.
+
+### 5. Reproduce the EDA
+
+Needs the backfills from step 2. With the tunnel open, run this from the project folder. `read` waits
+silently for the database password.
+
+```bash
+python -m venv .venv && .venv/bin/pip install -r requirements-eda.txt
+read -rs PW && PYTHONPATH="$PWD/src" DATABASE_URL= POSTGRES_HOST=localhost POSTGRES_PORT=15432 \
+  POSTGRES_DB=<db> POSTGRES_USER=<user> POSTGRES_PASSWORD="$PW" \
+  .venv/bin/python -m nbconvert --to notebook --execute --inplace notebooks/01_eda.ipynb
+```
+
+### 6. Optional: the GitHub Actions backup
+
+Add the repository secret `DATABASE_URL` with the connection URL of a hosted TimescaleDB. The workflow then
+polls RTSW and Kp into it hourly. Scheduled runs can be late, which is harmless because each run fetches the
+full ~24 h window. GitHub disables scheduled workflows after about 60 days without repository activity.
 
 ## Tests
 
