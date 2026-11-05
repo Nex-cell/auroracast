@@ -14,6 +14,18 @@
 
   Also I am negotiating a deal on a cloud VM for running this and other services. Wich is why data collection is still only local.
   If the deal doesnt workout there is free credit as a fallback.
+
+### 2026-11-05 (MS2)
+
+- Host decided: <provider> VM on free credits, as the server deal did not work out. TimescaleDB and the
+  OMNI (1998-2026) and Kp backfills run there.
+- The hourly poller runs on GitHub Actions into a temporary Tiger Cloud database and has data from
+  14 Oct, later than the requested early October because I was sick.
+- EDA with both persistence variants and the frozen targets: see "Frozen targets" and notebooks/01_eda.ipynb.
+- Not done yet: the shared feature module, nowcast vs definitive (no data yet), a full OMNI vs RTSW
+  comparison (only 33 overlapping hours), NOAA forecast logging.
+
+
   
 ## Frozen targets and decision thresholds
 
