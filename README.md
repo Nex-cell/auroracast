@@ -12,6 +12,8 @@
 - The server polls RTSW and Kp hourly itself, with data from 14 Oct, later than the requested early
   October because I was sick. GitHub Actions into a temporary Tiger Cloud database keeps running as a backup.
 - EDA with both persistence variants and the frozen targets: see "Frozen targets" and notebooks/01_eda.ipynb.
+- **Why things changed from the proposal**, for example why Airflow moved to stretch and why Tiger Cloud was
+  used first: see [docs/DECISIONS.md](docs/DECISIONS.md).
 - Not done yet: the shared feature module, nowcast vs definitive (no data yet), a full OMNI vs RTSW
   comparison (only 33 overlapping hours), NOAA forecast logging.
 
@@ -70,8 +72,12 @@ forecast for the live comparison is not built yet.
 | GFZ Kp, hourly | VM | crontab entry |
 | Backup of both polls | GitHub Actions into Tiger Cloud | `.github/workflows/rtsw-poller.yml` |
 
-The reasons for this setup and how it evolved are in [DECISIONS.md](DECISIONS.md). No forecasting model or
-feature pipeline exists yet.
+Automation currently uses a Python loop, cron and GitHub Actions instead of the Airflow setup from the
+proposal, following feedback item A4. One cron container is planned to run all pipelines, and Airflow is
+a stretch goal.
+
+The reasons for this setup and how it evolved are in [docs/DECISIONS.md](docs/DECISIONS.md). No forecasting
+model or feature pipeline exists yet.
 
 ## Setup from a fresh clone
 
