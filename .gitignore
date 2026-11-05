@@ -216,3 +216,21 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# AuroraCast: data, dumps and model artefacts never go into git
+data/
+/data
+*.dump
+mlruns/
+mlartifacts/
+
+# Windows download markers (WSL)
+*:Zone.Identifier
+
+# secrets and local data
+.env
+data/
+*.dump
+mlruns/
+
+

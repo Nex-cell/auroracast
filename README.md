@@ -5,6 +5,16 @@
 > This section is where I post updates and notes for you ahead of each milestone (MS).
 > Newest entry first; everything below it documents the project itself.
 
+### 2026-11-05 (MS2)
+
+- Host decided: Infomaniak Ubuntu VM on free credits, as the server deal did not work out. TimescaleDB and the
+  OMNI (1998-2026) and Kp backfills run there.
+- The server polls RTSW and Kp hourly itself, with data from 14 Oct, later than the requested early
+  October because I was sick. GitHub Actions into a temporary Tiger Cloud database keeps running as a backup.
+- EDA with both persistence variants and the frozen targets: see "Frozen targets" and notebooks/01_eda.ipynb.
+- Not done yet: the shared feature module, nowcast vs definitive (no data yet), a full OMNI vs RTSW
+  comparison (only 33 overlapping hours), NOAA forecast logging.
+
 ### 2026-10-14
 - Live solar-wind collection (NOAA RTSW, wind + magnetic field) has been running since 14 Oct 2026.
   The feed only keeps ~24 h, so it is persisted hourly into TimescaleDB. For now it runs on my laptop
@@ -15,18 +25,6 @@
   Also I am negotiating a deal on a cloud VM for running this and other services. Wich is why data collection is still only local.
   If the deal doesnt workout there is free credit as a fallback.
 
-### 2026-11-05 (MS2)
-
-- Host decided: <provider> VM on free credits, as the server deal did not work out. TimescaleDB and the
-  OMNI (1998-2026) and Kp backfills run there.
-- The hourly poller runs on GitHub Actions into a temporary Tiger Cloud database and has data from
-  14 Oct, later than the requested early October because I was sick.
-- EDA with both persistence variants and the frozen targets: see "Frozen targets" and notebooks/01_eda.ipynb.
-- Not done yet: the shared feature module, nowcast vs definitive (no data yet), a full OMNI vs RTSW
-  comparison (only 33 overlapping hours), NOAA forecast logging.
-
-
-  
 ## Frozen targets and decision thresholds
 
 Frozen on 2026-11-05 from 1998-2023 data only, before any model or baseline was scored on the test
