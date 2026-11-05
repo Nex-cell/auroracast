@@ -14,3 +14,8 @@ kp:
   url: https://kp.gfz.de/app/json/
   live_lookback_days: 45
   request_timeout_seconds: 60
+
+omni:
+  # NASA high-resolution OMNI, 1-min values, one ~160 MB ASCII file per year.
+  url_template: https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/omni_min{year}.asc
+  request_timeout_seconds: 120
